@@ -5,10 +5,10 @@ Configuration for the main router model
 # Model architecture
 MODEL_CONFIG = {
     "vocab_size": 59496,  # From unified tokenizer
-    "hidden_dim": 512,
+    "hidden_dim": 384,  # Reduced from 512 to keep total params <50M
     "num_layers": 6,
     "num_heads": 8,
-    "ffn_dim": 2048,
+    "ffn_dim": 1536,  # Reduced proportionally
     "max_seq_length": 2048,
     "dropout": 0.1,
 }
