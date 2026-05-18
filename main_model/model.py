@@ -230,7 +230,7 @@ class RouterModel(nn.Module):
                 device=x.device,
                 dtype=torch.float32,
             )
-            attention_mask = torch.tril(attention_mask).unsqueeze(0)
+            attention_mask = torch.tril(attention_mask)
         
         # Apply transformer layers
         for layer in self.layers:
@@ -259,8 +259,14 @@ class RouterModel(nn.Module):
             
             # Top-k filtering
             if top_k > 0:
-                indices = torch.topk(next_logits, top_k)[1]
-                next_logits[next_logits < torch.kth_value(next_logits, top_k)[0]] = float('-inf')
+                # Use topk instead of deprecated kth_value
+                kth_vals = torch.topk(next_logits, top_k, largest=True)[0]
+                kth_val = kth_vals[:, -1:]  # Get the k-th largest value
+                next_logits = torch.where(
+                    next_logits >= kth_val,
+                    next_logits,
+                    torch.tensor(float('-inf'), device=next_logits.device)
+                )
             
             # Top-p filtering
             if top_p < 1.0:

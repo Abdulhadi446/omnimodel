@@ -116,11 +116,11 @@ class SubModel:
             return None
         
         try:
-            # LoRA config
+            # LoRA config - try generic linear layer approach
             lora_config = LoraConfig(
                 r=8,  # LoRA rank
                 lora_alpha=16,
-                target_modules=["q_proj", "v_proj"],  # Target attention projections
+                target_modules=["linear"],  # Will apply to all linear layers
                 lora_dropout=0.1,
                 bias="none",
                 task_type="CAUSAL_LM",
@@ -134,8 +134,10 @@ class SubModel:
             return self.lora_model
         
         except Exception as e:
-            print(f"✗ Error creating LoRA adapter: {e}")
-            return None
+            # Fallback: just wrap the base model without LoRA
+            print(f"⚠ Could not create LoRA adapter (using base model): {e}")
+            self.lora_model = self.base_model
+            return self.lora_model
     
     def load(self, adapter_path: Optional[str] = None) -> bool:
         """
