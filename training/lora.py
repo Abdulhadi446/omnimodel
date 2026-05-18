@@ -162,11 +162,11 @@ def fine_tune_lora(
     dataset = StyleDataset(examples, modality, style)
     dataloader = DataLoader(dataset, batch_size=16, shuffle=True)
     
-    # Create LoRA config
+    # Create LoRA config - target linear layers in transformer
     lora_config = LoraConfig(
         r=8,
         lora_alpha=16,
-        target_modules=["q_proj", "v_proj"],
+        target_modules=["out_proj", "linear1", "linear2"],  # layers in TransformerEncoderLayer
         lora_dropout=0.1,
         bias="none",
         task_type="CAUSAL_LM",
@@ -199,7 +199,7 @@ def fine_tune_lora(
             input_ids = batch["input_ids"].to(device)
             target_ids = batch["target_ids"].to(device)
             
-            # Forward pass
+            # Forward pass - model expects tensor input
             logits = peft_model(input_ids)
             
             # Compute loss
