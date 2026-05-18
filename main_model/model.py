@@ -281,11 +281,16 @@ class RouterModel(nn.Module):
             
             # Top-p filtering
             if top_p < 1.0:
-                sorted_logits, sorted_indices = torch.sort(next_logits, descending=True)
+                sorted_logits, sorted_indices = torch.sort(next_logits, descending=True, dim=-1)
                 cumsum = torch.cumsum(torch.softmax(sorted_logits, dim=-1), dim=-1)
                 sorted_indices_to_remove = cumsum > top_p
                 sorted_indices_to_remove[..., 0] = False
-                next_logits[sorted_indices[sorted_indices_to_remove]] = float('-inf')
+                # Set removed indices to -inf using scatter_
+                next_logits.scatter_(-1, sorted_indices, torch.where(
+                    sorted_indices_to_remove,
+                    torch.tensor(float('-inf'), device=next_logits.device),
+                    sorted_logits
+                ))
             
             # Replace any -inf with a small value to avoid multinomial errors
             next_logits = torch.where(
