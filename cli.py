@@ -31,10 +31,10 @@ from pathlib import Path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 try:
-    from omnimodel.runtime.router import create_router
-    from omnimodel.runtime.loader import create_lazy_loader
-    from omnimodel.runtime.tools import create_tool_registry
-    from omnimodel.tokenizer.unified import UnifiedTokenizer
+    from runtime.router import create_router
+    from runtime.loader import create_lazy_loader
+    from runtime.tools import create_tool_registry
+    from tokenizer.unified import UnifiedTokenizer
     IMPORTS_OK = True
 except ImportError as e:
     print(f"⚠ Import error: {e}")
