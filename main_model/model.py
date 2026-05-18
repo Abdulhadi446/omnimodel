@@ -30,8 +30,16 @@ class RotaryPositionalEmbedding(nn.Module):
         """
         seq_len = x.shape[1]
         t = torch.arange(seq_len, device=x.device, dtype=self.inv_freq.dtype)
-        freqs = torch.einsum("i,j->ij", t, self.inv_freq)
-        emb = torch.cat([freqs, freqs], dim=-1)
+        freqs = torch.einsum("i,j->ij", t, self.inv_freq)  # [seq_len, dim//2]
+        
+        # Duplicate frequencies to match dimension
+        if self.dim % 2 == 1:
+            # Odd dimension - pad
+            emb = torch.cat([freqs, torch.zeros_like(freqs[:, -1:])], dim=-1)
+        else:
+            # Even dimension - concatenate
+            emb = torch.cat([freqs, freqs], dim=-1)
+        
         cos = emb.cos()
         sin = emb.sin()
         return cos, sin
@@ -287,14 +295,16 @@ class RouterModel(nn.Module):
 
 def create_router_model(pretrained: bool = False) -> RouterModel:
     """Create and optionally load a router model"""
+    from .config import MODEL_CONFIG
+    
     model = RouterModel(
-        vocab_size=59496,
-        hidden_dim=512,
-        num_layers=6,
-        num_heads=8,
-        ffn_dim=2048,
-        max_seq_length=2048,
-        dropout=0.1,
+        vocab_size=MODEL_CONFIG["vocab_size"],
+        hidden_dim=MODEL_CONFIG["hidden_dim"],
+        num_layers=MODEL_CONFIG["num_layers"],
+        num_heads=MODEL_CONFIG["num_heads"],
+        ffn_dim=MODEL_CONFIG["ffn_dim"],
+        max_seq_length=MODEL_CONFIG["max_seq_length"],
+        dropout=MODEL_CONFIG["dropout"],
     )
     
     print(f"✓ Created router model with {model.n_params / 1e6:.1f}M parameters")
