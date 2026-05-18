@@ -93,8 +93,10 @@ class OmniModelRouter:
             self.sub_models[('text', 'general')] = base_model
         
         except Exception as e:
-            # Silently fail - router will use defaults
-            pass
+            # Debug: print the error
+            import traceback
+            print(f"⚠ Could not initialize components: {e}")
+            traceback.print_exc()
     
     def detect_modality(self, input_data: Union[str, Path]) -> str:
         """
