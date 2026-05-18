@@ -77,7 +77,7 @@ class OmniModelRouter:
             self.router_model = create_router_model(pretrained=False)
             
             # Initialize lazy loader
-            self.lazy_loader = LazyModelLoader(limit_mb=900)
+            self.lazy_loader = LazyModelLoader(ram_limit_mb=900)
             
             # Initialize tool registry
             self.tool_registry = create_tool_registry()
