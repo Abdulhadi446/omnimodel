@@ -1,5 +1,5 @@
 #!/bin/bash
-# QUICKSTART.sh - Quick setup and test of OmniModel
+# QUICKSTART.sh - Quick setup, test, and train OmniModel
 
 set -e
 
@@ -31,21 +31,20 @@ echo "=========================================="
 echo "✓ Setup complete!"
 echo "=========================================="
 echo ""
-echo "Quick start examples:"
+echo "Next steps:"
 echo ""
-echo "  Text generation:"
-echo "    python cli.py --input \"hello world\""
+echo "1. Test inference:"
+echo "    python3 cli.py --input \"hello world\""
 echo ""
-echo "  With style:"
-echo "    python cli.py --input \"write a poem\" --style creative"
+echo "2. Start training (CPU or GPU):"
+echo "    python3 train.py"
 echo ""
-echo "  With tools:"
-echo "    python cli.py --input \"what is 2+2\" --tools"
+echo "3. Training examples:"
+echo "    python3 cli.py --input \"write a poem\" --style creative"
+echo "    python3 cli.py --input \"what is 2+2\" --tools"
+echo "    python3 cli.py --input \"test\" --output result.txt"
 echo ""
-echo "  With output file:"
-echo "    python cli.py --input \"test\" --output result.txt"
-echo ""
-echo "  Check memory usage:"
+echo "4. Monitor memory usage:"
 echo "    watch -n 1 free -h"
 echo ""
 echo "=========================================="
