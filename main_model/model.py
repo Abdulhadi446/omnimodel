@@ -97,6 +97,9 @@ class MultiHeadAttention(nn.Module):
         scores = torch.matmul(q, k.transpose(-2, -1))  # [batch, heads, seq_len, seq_len]
         
         if attention_mask is not None:
+            # Expand mask for multi-head: [batch, seq_len, seq_len] -> [batch, 1, seq_len, seq_len]
+            if attention_mask.dim() == 3:
+                attention_mask = attention_mask.unsqueeze(1)
             scores = scores.masked_fill(attention_mask == 0, float("-inf"))
         
         attn_weights = torch.softmax(scores, dim=-1)
@@ -266,9 +269,9 @@ class RouterModel(nn.Module):
             next_logits = logits[:, -1, :] / temperature
             
             # Top-k filtering
-            if top_k > 0:
+            if top_k > 0 and top_k < next_logits.shape[-1]:
                 # Use topk instead of deprecated kth_value
-                kth_vals = torch.topk(next_logits, top_k, largest=True)[0]
+                kth_vals = torch.topk(next_logits, min(top_k, next_logits.shape[-1]), largest=True)[0]
                 kth_val = kth_vals[:, -1:]  # Get the k-th largest value
                 next_logits = torch.where(
                     next_logits >= kth_val,
@@ -283,6 +286,13 @@ class RouterModel(nn.Module):
                 sorted_indices_to_remove = cumsum > top_p
                 sorted_indices_to_remove[..., 0] = False
                 next_logits[sorted_indices[sorted_indices_to_remove]] = float('-inf')
+            
+            # Replace any -inf with a small value to avoid multinomial errors
+            next_logits = torch.where(
+                torch.isinf(next_logits),
+                torch.tensor(float('-100'), device=next_logits.device),
+                next_logits
+            )
             
             # Sample next token
             probs = torch.softmax(next_logits, dim=-1)
