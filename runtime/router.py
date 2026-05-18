@@ -58,6 +58,12 @@ class OmniModelRouter:
         
         try:
             # Import here to avoid circular imports
+            import sys
+            import os
+            parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            if parent_dir not in sys.path:
+                sys.path.insert(0, parent_dir)
+            
             from tokenizer.unified import UnifiedTokenizer
             from main_model.model import create_router_model
             from sub_models.base import SubModelBase
