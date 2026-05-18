@@ -11,23 +11,13 @@ echo "=========================================="
 python_version=$(python3 --version 2>&1 | awk '{print $2}')
 echo "✓ Python $python_version found"
 
-# Create virtual environment
-if [ ! -d "venv" ]; then
-    echo "Creating virtual environment..."
-    python3 -m venv venv
-fi
-
-# Activate venv
-source venv/bin/activate
-echo "✓ Virtual environment activated"
-
-# Install dependencies
+# Install dependencies directly
 echo "Installing dependencies..."
-pip install -q torch transformers peft psutil numpy scipy einops safetensors --no-warn-script-location
+python3 -m pip install -q torch transformers peft psutil numpy scipy einops safetensors --no-warn-script-location
 
 # Optional: Install for full functionality
 echo "Installing optional dependencies..."
-pip install -q encodec pypdf2 pillow requests --no-warn-script-location 2>/dev/null || true
+python3 -m pip install -q encodec pypdf2 pillow requests --no-warn-script-location 2>/dev/null || true
 
 echo "✓ Dependencies installed"
 
